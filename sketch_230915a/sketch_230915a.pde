@@ -9,6 +9,7 @@ import ddf.minim.ugens.*;
 //Global Variables
 Minim minim; //creates object to access all functions
 AudioPlayer song1; //creates "Play List" variable holding extensions WAV, AIFF, AU, SND, and MP3
+AudioMetaData songMetaData1; //Stores everything from PlayList Properties TAB (.mp3)
 //
 void setup() {
   //size() or fullScreen()
@@ -21,7 +22,32 @@ void setup() {
   // See: https://poanchen.github.io/blog/2016/11/15/how-to-add-background-music-in-processing-3.0
   println(path);
   song1 = minim.loadFile( path );
+  songMetaData1 = song1.getMetaData();
   //song1.loop(0);
+  //
+  //Meta Data Println Testing
+  //For Prototyping, print all information to the console first
+  //Verifying Meta Data, 18 println's 
+  //Repeat: println("?", songMetaData1.?() );
+  println("File Name", songMetaData1.fileName() ); //Data Correct, Verified in Console
+  //Must use pure Java at OS Level to list fileName before loading Playlist
+  println("Song Length (in milliseconds)", songMetaData1.length() );
+  println("Song Length (in seconds)", songMetaData1.length()/1000 ); 
+  //println("Song Length (in minutes & seconds)", songMetaData1.?() ); //Gets Formula
+  println("Song Title", songMetaData1.title() );
+  println("Author", songMetaData1.author() );
+  println("Composer", songMetaData1.composer() );
+  println("Orchestra", songMetaData1.orchestra() );
+  println("Album", songMetaData1.album() );
+  println("Disk", songMetaData1.disc() );
+  println("Publisher", songMetaData1.publisher() );
+  println("Date Released", songMetaData1.date() );
+  println("Copyright", songMetaData1.copyright() );
+  println("Comments", songMetaData1.comment() );
+  println("Lyrics", songMetaData1.lyrics() ); //OPTIONAL: Music App Sing Along
+  println("Track", songMetaData1.track() );
+  println("Genre", songMetaData1.genre() );
+  println("Encoded", songMetaData1.encoded() );
 } //End setup
 //
 void draw() {
@@ -32,15 +58,15 @@ void draw() {
   if ( song1.isPlaying() && !song1.isLooping() ) println("Play Once");
   //
   //Debugging Fast Forward and Fast Rewind
-  println( "Song Position", song1.position(), "Song Length", song1.length() );
+  //println( "Song Position", song1.position(), "Song Length", song1.length() );
   //
 } //End draw
 //
 void keyPressed() {
-  if ( key=='S' || key=='s' ) song1.play(); //Parameter is milli-seconds from start of audio file to start playing (illustrate with examples)
+  if ( key=='C' || key=='c' ) song1.play(); //Parameter is milli-seconds from start of audio file to start playing (illustrate with examples)
   //.play() includes .rewind()
   //
-  if ( key>='2' || key<='8' ) { //Loop Button, previous (key=='1' || key=='9')
+  if ( key>='2' || key<='1' ) { //Loop Button, previous (key=='1' || key=='9')
     //Note: "9" is assumed to be massive! "Simulate Infinite"
     String keystr = String.valueOf(key);
     //println(keystr);
@@ -48,9 +74,9 @@ void keyPressed() {
     song1.loop(loopNum); //Parameter is number of repeats
     //
   }
-  if ( key=='A' || key=='A' ) song1.loop(); //Infinite Loop, no parameter OR -1
+  if ( key=='Q' || key=='q' ) song1.loop(); //Infinite Loop, no parameter OR -1
   //
-  if ( key=='B' || key=='b' ) { //MUTE Button
+  if ( key=='S' || key=='s' ) { //MUTE Button
     //MUTE Behaviour: stops electricty to speakers, does not stop file
     //NOTE: MUTE has NO built-in PUASE button, NO built-in rewind button
     //ERROR: if song near end of file, user will not know song is at the end
@@ -69,11 +95,11 @@ void keyPressed() {
   //Possible ERROR: FR rewinds to parameter milliseconds from SONG Start
   //How does this get to be a true ff and fr button
   //Actual .skip() allows for varaible ff & fr using .position()+-
-  if ( key=='H' || key=='h' ) song1.skip( 0 ); //SKIP forward 1 second (1000 milliseconds)
-  if ( key=='Q' || key=='q' ) song1.skip( 1000 ); //SKIP  backawrds 1 second, notice negative, (-1000 milliseconds)
+  if ( key=='D' || key=='d' ) song1.skip( 0 ); //SKIP forward 1 second (1000 milliseconds)
+  if ( key=='B' || key=='b' ) song1.skip( 1000 ); //SKIP  backawrds 1 second, notice negative, (-1000 milliseconds)
   //
   //Simple STOP Behaviour: ask if .playing() & .pause() & .rewind(), or .rewind()
-  if ( key=='K' | key=='K' ) {
+  if ( key=='T' | key=='t' ) {
     if ( song1.isPlaying() ) {
       song1.pause(); //auto .rewind()
     } else {
@@ -82,7 +108,7 @@ void keyPressed() {
   }
   //
   //Simple Pause Behaviour: .pause() & hold .position(), then PLAY
-  if ( key=='Y' | key=='y' ) {
+  if ( key=='E' | key=='e' ) {
     if ( song1.isPlaying()==true ) {
       song1.pause(); //auto .rewind()
     } else {
