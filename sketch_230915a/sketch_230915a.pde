@@ -10,6 +10,8 @@ import ddf.minim.ugens.*;
 Minim minim; //creates object to access all functions
 AudioPlayer song1; //creates "Play List" variable holding extensions WAV, AIFF, AU, SND, and MP3
 AudioMetaData songMetaData1; //Stores everything from PlayList Properties TAB (.mp3)
+PFont generalFont;
+color purple = #2C08FF;
 //
 void setup() {
   //size() or fullScreen()
@@ -23,6 +25,7 @@ void setup() {
   println(path);
   song1 = minim.loadFile( path );
   songMetaData1 = song1.getMetaData();
+  generalFont = createFont ("Harrington", 55); //Must also Tools / Create Font / Find Font / Do Not Press "OK"
   //song1.loop(0);
   //
   //Meta Data Println Testing
@@ -33,7 +36,7 @@ void setup() {
   //Must use pure Java at OS Level to list fileName before loading Playlist
   println("Song Length (in milliseconds)", songMetaData1.length() );
   println("Song Length (in seconds)", songMetaData1.length()/1000 ); 
-  //println("Song Length (in minutes & seconds)", songMetaData1.?() ); //Gets Formula
+  println("Song Length (in minutes & seconds)", songMetaData1.length()/1000/60, "minutes", ( songMetaData1.length()/1000 - ( songMetaData1.length()/1000/60)*60 ), "seconds" ); //Gets Formula
   println("Song Title", songMetaData1.title() );
   println("Author", songMetaData1.author() );
   println("Composer", songMetaData1.composer() );
@@ -60,13 +63,22 @@ void draw() {
   //Debugging Fast Forward and Fast Rewind
   //println( "Song Position", song1.position(), "Song Length", song1.length() );
   //
+  // songMetaData1.title()
+  rect(width*1/4, height*0, width*1/2, height*3/10); //mistake
+  fill(purple); //Ink
+  textAlign (CENTER, CENTER); //Align X&Y, see Processing.org / Reference
+  //Values: [LEFT | CENTER | RIGHT] & [TOP | CENTER | BOTTOM | BASELINE]
+  int size = 10; //Change this font size
+  textFont(generalFont, size); //Change the number until it fits, largest font size
+  text(songMetaData1.title(), width*1/4, height*0, width*1/2, height*3/10);
+  fill(255); //Reset to white for rest of the program
 } //End draw
 //
 void keyPressed() {
-  if ( key=='C' || key=='c' ) song1.play(); //Parameter is milli-seconds from start of audio file to start playing (illustrate with examples)
+  if ( key=='O' || key=='o' ) song1.play(); //Parameter is milli-seconds from start of audio file to start playing (illustrate with examples)
   //.play() includes .rewind()
   //
-  if ( key>='2' || key<='1' ) { //Loop Button, previous (key=='1' || key=='9')
+  if ( key>='2' || key<='8' ) { //Loop Button, previous (key=='1' || key=='9')
     //Note: "9" is assumed to be massive! "Simulate Infinite"
     String keystr = String.valueOf(key);
     //println(keystr);
@@ -74,9 +86,9 @@ void keyPressed() {
     song1.loop(loopNum); //Parameter is number of repeats
     //
   }
-  if ( key=='Q' || key=='q' ) song1.loop(); //Infinite Loop, no parameter OR -1
+  if ( key=='T' || key=='t' ) song1.loop(); //Infinite Loop, no parameter OR -1
   //
-  if ( key=='S' || key=='s' ) { //MUTE Button
+  if ( key=='R' || key=='r' ) { //MUTE Button
     //MUTE Behaviour: stops electricty to speakers, does not stop file
     //NOTE: MUTE has NO built-in PUASE button, NO built-in rewind button
     //ERROR: if song near end of file, user will not know song is at the end
@@ -95,11 +107,11 @@ void keyPressed() {
   //Possible ERROR: FR rewinds to parameter milliseconds from SONG Start
   //How does this get to be a true ff and fr button
   //Actual .skip() allows for varaible ff & fr using .position()+-
-  if ( key=='D' || key=='d' ) song1.skip( 0 ); //SKIP forward 1 second (1000 milliseconds)
-  if ( key=='B' || key=='b' ) song1.skip( 1000 ); //SKIP  backawrds 1 second, notice negative, (-1000 milliseconds)
+  if ( key=='W' || key=='w' ) song1.skip( 0 ); //SKIP forward 1 second (1000 milliseconds)
+  if ( key=='E' || key=='e' ) song1.skip( 1000 ); //SKIP  backawrds 1 second, notice negative, (-1000 milliseconds)
   //
   //Simple STOP Behaviour: ask if .playing() & .pause() & .rewind(), or .rewind()
-  if ( key=='T' | key=='t' ) {
+  if ( key=='G' | key=='g' ) {
     if ( song1.isPlaying() ) {
       song1.pause(); //auto .rewind()
     } else {
@@ -108,7 +120,7 @@ void keyPressed() {
   }
   //
   //Simple Pause Behaviour: .pause() & hold .position(), then PLAY
-  if ( key=='E' | key=='e' ) {
+  if ( key=='C' | key=='c' ) {
     if ( song1.isPlaying()==true ) {
       song1.pause(); //auto .rewind()
     } else {
