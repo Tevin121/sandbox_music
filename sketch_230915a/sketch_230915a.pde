@@ -107,14 +107,14 @@ void keyPressed() {
   if ( soundEffects[2].position()!=0 ) soundEffects[2].rewind();
   soundEffects[2].play();
   //
-  if ( key=='P' || key=='p' ) {
+  if ( key=='G' || key=='g' ) {
     delay( soundEffects[2].length() ); //parameter in millisecond
     playList[currentSong].play(); //Parameter is milli-seconds from start of audio file to start playing (illustrate with examples)
     //.play() includes .rewind()??
   }
   //
   //Simple STOP Behaviour: ask if .playing() & .pause() & .rewind(), or .rewind()
-  if ( key=='S' | key=='s' ) {
+  if ( key=='N' | key=='n' ) {
     if ( playList[currentSong].isPlaying() ) {
       playList[currentSong].pause(); //auto .rewind()
     } else {
