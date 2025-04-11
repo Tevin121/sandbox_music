@@ -20,7 +20,7 @@ color purple = #2C08FF;
 PFont generalFont;
 //
 void setup() {
-  //size() or fullScreen()
+  size(700, 500); //or fullScreen()
   //Display Algorithm
   minim = new Minim(this); //load from data directory, loadFile should also load from project folder, like loadImage
   //Music File Load
