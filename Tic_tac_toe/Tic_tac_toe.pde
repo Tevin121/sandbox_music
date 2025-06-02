@@ -1,11 +1,8 @@
-int[][] board = {
-  {0, 0, 0},
-  {0, 0, 0},
-  {0, 0, 0}
-}; // 0 = empty, 1 = X, 2 = O
+int[] board = {0, 0, 0, 0, 0, 0, 0, 0, 0}; // 0 = empty, 1 = X, 2 = O
 int currentPlayer = 1; // Player 1 starts (X)
 boolean gameOver = false; // Is the game over?
 boolean playVsAI = false; // Is the player fighting the AI?
+String aiDifficulty = "Easy"; // Default AI difficulty
 
 // Scoreboard
 int player1Wins = 0;
@@ -30,7 +27,9 @@ void draw() {
   drawBoard(); // Draw X and O on the board
   drawScoreboard(); // Show the scoreboard
   drawPlayVsAIButton(); // Show the "Play vs AI" button
+  drawAIDifficultySelector(); // Show the AI difficulty selector
   drawResetButton(); // Show the "Reset" button
+  drawCloseButton(); // Show the "X" close button
 
   // If the game is over, show the winner or tie message
   if (gameOver) {
@@ -42,7 +41,7 @@ void draw() {
   }
 }
 
-// Handle mouse clicks
+// Handle mouse clicks for buttons and grid
 void mousePressed() {
   // Check if the "Reset" button is clicked
   if (mouseX > width / 2 - buttonWidth / 2 && mouseX < width / 2 + buttonWidth / 2 &&
@@ -59,6 +58,27 @@ void mousePressed() {
     return;
   }
 
+  // Check if the "Easy" AI button is clicked
+  if (mouseX > width / 2 + buttonWidth / 2 + 10 && mouseX < width / 2 + buttonWidth + 10 &&
+      mouseY > height - buttonHeight * 3.5 && mouseY < height - buttonHeight * 2.5) {
+    aiDifficulty = "Easy"; // Set AI difficulty to Easy
+    resetGame(); // Reset the game
+    return;
+  }
+
+  // Check if the "Hard" AI button is clicked
+  if (mouseX > width / 2 + buttonWidth + 20 && mouseX < width / 2 + buttonWidth * 1.5 + 20 &&
+      mouseY > height - buttonHeight * 3.5 && mouseY < height - buttonHeight * 2.5) {
+    aiDifficulty = "Hard"; // Set AI difficulty to Hard
+    resetGame(); // Reset the game
+    return;
+  }
+
+  // Check if the "X" close button is clicked
+  if (mouseX > width - 50 && mouseX < width - 10 && mouseY > 10 && mouseY < 50) {
+    exit(); // Close the game
+  }
+
   // If the game is over or it's AI's turn, do nothing
   if (gameOver || (playVsAI && currentPlayer == 2)) {
     return;
@@ -68,10 +88,34 @@ void mousePressed() {
   if (mouseY < gridHeight) {
     int row = floor(mouseY / (gridHeight / 3)); // Calculate row
     int col = floor(mouseX / (width / 3)); // Calculate column
+    int index = row * 3 + col; // Convert 2D coordinates to 1D index
 
-    // If the square is empty, make a move
-    if (board[row][col] == 0) {
-      board[row][col] = currentPlayer; // Place the current player's mark
+    // If the square is empty, place the current player's mark
+    if (board[index] == 0) {
+      board[index] = currentPlayer; // Place the current player's mark
+      checkGameState(); // Check if the game is over
+      currentPlayer = 3 - currentPlayer; // Switch player (1 -> 2, 2 -> 1)
+    }
+  }
+}
+
+// Handle keyboard input for placing X or O and resetting the game
+void keyPressed() {
+  // Reset the game when the "R" key is pressed
+  if (key == 'R' || key == 'r') {
+    resetGame();
+    return; // Exit the function after resetting
+  }
+
+  if (gameOver) return; // Do nothing if the game is over
+
+  // Check if the key corresponds to a square (1-9)
+  if (key >= '1' && key <= '9') {
+    int index = key - '1'; // Convert key ('1'-'9') to index (0-8)
+
+    // If the square is empty, place the current player's mark
+    if (board[index] == 0) {
+      board[index] = currentPlayer; // Place the current player's mark
       checkGameState(); // Check if the game is over
       currentPlayer = 3 - currentPlayer; // Switch player (1 -> 2, 2 -> 1)
     }
@@ -102,15 +146,21 @@ void drawGrid() {
 void drawBoard() {
   textSize(gridHeight / 6);
   textAlign(CENTER, CENTER);
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      if (board[i][j] == 1) {
-        fill(0, 255, 0); // Green for X
-        text("X", j * width / 3 + width / 6, i * gridHeight / 3 + gridHeight / 6);
-      } else if (board[i][j] == 2) {
-        fill(255, 0, 0); // Red for O
-        text("O", j * width / 3 + width / 6, i * gridHeight / 3 + gridHeight / 6);
-      }
+  for (int i = 0; i < 9; i++) {
+    int row = i / 3; // Calculate row from index
+    int col = i % 3; // Calculate column from index
+    float x = col * width / 3 + width / 6;
+    float y = row * gridHeight / 3 + gridHeight / 6;
+
+    if (board[i] == 1) {
+      fill(0, 255, 0); // Green for X
+      text("X", x, y);
+    } else if (board[i] == 2) {
+      fill(255, 0, 0); // Red for O
+      text("O", x, y);
+    } else {
+      fill(255); // White for numbers
+      text(str(i + 1), x, y); // Display the square number
     }
   }
 }
@@ -141,6 +191,23 @@ void drawPlayVsAIButton() {
   text(playVsAI ? "Stop AI" : "Play vs AI", width / 2, height - buttonHeight * 3); // Button label
 }
 
+// Draw the AI difficulty selector
+void drawAIDifficultySelector() {
+  // Draw "Easy" button
+  fill(aiDifficulty == "Easy" ? 0 : 255); // Highlight if selected
+  rect(width / 2 + buttonWidth / 2 + 10, height - buttonHeight * 3.5, buttonWidth / 2, buttonHeight, 5);
+  fill(aiDifficulty == "Easy" ? 255 : 0); // Text color
+  textSize(buttonHeight * 0.6);
+  textAlign(CENTER, CENTER);
+  text("Easy", width / 2 + buttonWidth * 0.75 + 10, height - buttonHeight * 3);
+
+  // Draw "Hard" button
+  fill(aiDifficulty == "Hard" ? 0 : 255); // Highlight if selected
+  rect(width / 2 + buttonWidth + 20, height - buttonHeight * 3.5, buttonWidth / 2, buttonHeight, 5);
+  fill(aiDifficulty == "Hard" ? 255 : 0); // Text color
+  text("Hard", width / 2 + buttonWidth * 1.25 + 20, height - buttonHeight * 3);
+}
+
 // Draw the "Reset" button
 void drawResetButton() {
   fill(200); // Light gray button
@@ -149,6 +216,16 @@ void drawResetButton() {
   textSize(buttonHeight * 0.6);
   textAlign(CENTER, CENTER);
   text("Reset", width / 2, height - buttonHeight * 1.5); // Button label
+}
+
+// Draw the "X" close button
+void drawCloseButton() {
+  fill(255, 0, 0); // Red background for the close button
+  rect(width - 50, 10, 40, 40, 5); // Draw the button
+  fill(255); // White text
+  textSize(20);
+  textAlign(CENTER, CENTER);
+  text("X", width - 30, 30); // Draw the "X" label
 }
 
 // Display the winner or tie message
@@ -165,48 +242,84 @@ void displayWinner() {
 
 // Check if there's a winner
 int checkWinner() {
-  // Check rows and columns
-  for (int i = 0; i < 3; i++) {
-    if (board[i][0] != 0 && board[i][0] == board[i][1] && board[i][1] == board[i][2]) return board[i][0];
-    if (board[0][i] != 0 && board[0][i] == board[1][i] && board[1][i] == board[2][i]) return board[0][i];
+  // Check rows, columns, and diagonals
+  int[][] winPatterns = {
+    {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Rows
+    {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // Columns
+    {0, 4, 8}, {2, 4, 6}             // Diagonals
+  };
+  for (int[] pattern : winPatterns) {
+    if (board[pattern[0]] != 0 && board[pattern[0]] == board[pattern[1]] && board[pattern[1]] == board[pattern[2]]) {
+      return board[pattern[0]];
+    }
   }
-  // Check diagonals
-  if (board[0][0] != 0 && board[0][0] == board[1][1] && board[1][1] == board[2][2]) return board[0][0];
-  if (board[0][2] != 0 && board[0][2] == board[1][1] && board[1][1] == board[2][0]) return board[0][2];
   return 0; // No winner
 }
 
 // Check if the board is full
 boolean isBoardFull() {
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      if (board[i][j] == 0) return false; // Empty square found
-    }
+  for (int i = 0; i < 9; i++) {
+    if (board[i] == 0) return false; // Empty square found
   }
   return true; // All squares are filled
 }
 
 // Reset the game
 void resetGame() {
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      board[i][j] = 0; // Clear the board
-    }
+  for (int i = 0; i < 9; i++) {
+    board[i] = 0; // Clear the board
   }
   currentPlayer = 1; // Reset to Player 1
   gameOver = false; // Reset game state
 }
 
-// AI makes a random move
+// AI makes a move based on difficulty
 void aiMove() {
-  while (true) {
-    int row = int(random(3));
-    int col = int(random(3));
-    if (board[row][col] == 0) {
-      board[row][col] = 2; // AI plays as Player 2 (O)
-      checkGameState(); // Check if the game is over
-      currentPlayer = 1; // Switch back to Player 1
-      break;
+  if (aiDifficulty == "Easy") {
+    // Easy AI: Random move
+    while (true) {
+      int index = int(random(9));
+      if (board[index] == 0) {
+        board[index] = 2; // AI plays as Player 2 (O)
+        checkGameState(); // Check if the game is over
+        currentPlayer = 1; // Switch back to Player 1
+        break;
+      }
+    }
+  } else if (aiDifficulty == "Hard") {
+    // Hard AI: Try to win or block the player
+    for (int i = 0; i < 9; i++) {
+      if (board[i] == 0) {
+        // Try to win
+        board[i] = 2;
+        if (checkWinner() == 2) {
+          checkGameState();
+          currentPlayer = 1;
+          return;
+        }
+        board[i] = 0;
+
+        // Try to block the player
+        board[i] = 1;
+        if (checkWinner() == 1) {
+          board[i] = 2;
+          checkGameState();
+          currentPlayer = 1;
+          return;
+        }
+        board[i] = 0;
+      }
+    }
+
+    // If no winning or blocking move, make a random move
+    while (true) {
+      int index = int(random(9));
+      if (board[index] == 0) {
+        board[index] = 2; // AI plays as Player 2 (O)
+        checkGameState(); // Check if the game is over
+        currentPlayer = 1; // Switch back to Player 1
+        break;
+      }
     }
   }
 }
