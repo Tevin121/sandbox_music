@@ -242,17 +242,28 @@ void displayWinner() {
 
 // Check if there's a winner
 int checkWinner() {
-  // Check rows, columns, and diagonals
-  int[][] winPatterns = {
-    {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Rows
-    {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // Columns
-    {0, 4, 8}, {2, 4, 6}             // Diagonals
-  };
-  for (int[] pattern : winPatterns) {
-    if (board[pattern[0]] != 0 && board[pattern[0]] == board[pattern[1]] && board[pattern[1]] == board[pattern[2]]) {
-      return board[pattern[0]];
+  // Check rows
+  for (int i = 0; i < 3; i++) {
+    if (board[i * 3] != 0 && board[i * 3] == board[i * 3 + 1] && board[i * 3 + 1] == board[i * 3 + 2]) {
+      return board[i * 3]; // Return the winner (X or O)
     }
   }
+
+  // Check columns
+  for (int i = 0; i < 3; i++) {
+    if (board[i] != 0 && board[i] == board[i + 3] && board[i + 3] == board[i + 6]) {
+      return board[i]; // Return the winner (X or O)
+    }
+  }
+
+  // Check diagonals
+  if (board[0] != 0 && board[0] == board[4] && board[4] == board[8]) {
+    return board[0]; // Return the winner (X or O)
+  }
+  if (board[2] != 0 && board[2] == board[4] && board[4] == board[6]) {
+    return board[2]; // Return the winner (X or O)
+  }
+
   return 0; // No winner
 }
 
