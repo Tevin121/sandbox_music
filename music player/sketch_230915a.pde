@@ -31,6 +31,8 @@ void setup() {
   if (playList.length > 0) {
     currentSong = int(random(playList.length)); // Pick a random song to start
     playList[currentSong].play(); // Play the selected song
+  } else {
+    println("No songs found in the playlist.");
   }
 }
 
@@ -59,9 +61,9 @@ void draw() {
 void keyPressed() {
   // Play or pause the current song
   if (key == 'P' || key == 'p') {
-    if (playList[currentSong].isPlaying()) {
+    if (playList.length > 0 && playList[currentSong].isPlaying()) {
       playList[currentSong].pause(); // Pause the song
-    } else {
+    } else if (playList.length > 0) {
       playList[currentSong].play(); // Resume the song
     }
   }
@@ -81,6 +83,8 @@ void keyPressed() {
     if (soundEffects.length > 0) {
       soundEffects[0].rewind(); // Restart the sound effect
       soundEffects[0].play(); // Play the sound effect
+    } else {
+      println("No sound effects available.");
     }
   }
 }
@@ -108,6 +112,8 @@ void playNextSong() {
     currentSong = (currentSong + 1) % playList.length; // Move to the next song
     playList[currentSong].rewind(); // Restart the next song
     playList[currentSong].play(); // Play the next song
+  } else {
+    println("No songs available to play.");
   }
 }
 
@@ -118,6 +124,8 @@ void playPreviousSong() {
     currentSong = (currentSong - 1 + playList.length) % playList.length; // Move to the previous song
     playList[currentSong].rewind(); // Restart the previous song
     playList[currentSong].play(); // Play the previous song
+  } else {
+    println("No songs available to play.");
   }
 }
 
